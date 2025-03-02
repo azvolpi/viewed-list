@@ -1,0 +1,277 @@
+﻿<Window x:Class="ListMovie.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Просмотренные фильмы" Height="900" Width="1600" Background="#1E1E1E" WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <Style x:Key="NavButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#415A77"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="27"/>
+            <Setter Property="Height" Value="50"/>
+            <Setter Property="Width" Value="150"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            
+        </Style>
+        <Style x:Key="AddButtonStyle" TargetType="Button" BasedOn="{StaticResource NavButtonStyle}">
+            <Setter Property="Background" Value="#06D6A0"/>
+        </Style>
+        <Style x:Key="SearchBoxStyle" TargetType="TextBox">
+            <Setter Property="Background" Value="#415A77"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="Margin" Value="0,20,20,0"/>
+            <Setter Property="Width" Value="800"/>
+            <Setter Property="Height" Value="50"/>
+            <Setter Property="BorderBrush" Value="Gray"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+        <Style x:Key="PlaceholderTextBoxStyle" TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TextBox}">
+                        <Border x:Name="border"
+                        Padding="{TemplateBinding Padding}"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        SnapsToDevicePixels="True">
+                            <Grid>
+                                <ScrollViewer x:Name="PART_ContentHost" />
+                                <TextBlock x:Name="textBlock"
+                                   Margin="4,2,0,0"
+                                   Foreground="{TemplateBinding BorderBrush}"
+                                   IsHitTestVisible="False"
+                                   Text="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"
+                                   Visibility="Collapsed" />
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Text" Value="">
+                                <Setter TargetName="textBlock" Property="Visibility" Value="Visible" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="border" Property="Opacity" Value="0.56" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#FF7EB4EA" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#FF569DE5" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Background" Value="#415A77"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="27"/>
+            <Setter Property="Height" Value="50"/>
+            <Setter Property="Width" Value="150"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+    </Window.Resources>
+    <Grid Background="#0D1B2A">
+        <!-- Меню навигации -->
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20">
+            <Button Content="Аниме" Style="{StaticResource NavButtonStyle}" Margin="0,0,30,0" >
+                <Button.Resources>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="CornerRadius" Value="7"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
+            <Button Content="Фильмы" Style="{StaticResource NavButtonStyle}" Margin="0,0,30,0">
+                <Button.Resources>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="CornerRadius" Value="7"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
+            <Button Content="Сериалы" Style="{StaticResource NavButtonStyle}" Margin="0,0,30,0">
+                <Button.Resources>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="CornerRadius" Value="7"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
+            <TextBox x:Name="SearchBox" VerticalAlignment="Top" Margin="0,0,30,0"
+         Style="{StaticResource SearchBoxStyle}" Width="809"
+         TextChanged="SearchBox_TextChanged"/>
+
+            <Button Content="Добавить" Click="AddClick" Style="{StaticResource AddButtonStyle}" Margin="0,0,0,0" >
+                <Button.Resources>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="CornerRadius" Value="7"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
+        </StackPanel>
+        <!-- Список фильмов -->
+        <ListView x:Name="MoviesListView" ItemsSource="{Binding Movies}" ScrollViewer.CanContentScroll="false" ScrollViewer.VerticalScrollBarVisibility="Hidden" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Margin="20,100,20,20" BorderThickness="0" Background="{x:Null}" IsSynchronizedWithCurrentItem="False">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="Focusable" Value="false"/>
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.ItemTemplate>
+
+                <DataTemplate>
+                    <Border CornerRadius="10" Background="#0D1B2A" Margin="0,0,0,20" Padding="20" Width="1500" Height="280">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="160"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <!-- Картинка + оценка -->
+                            <Grid>
+                                <Image Source="{Binding ImageAnime}" Height="240"
+                           Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center"
+                           Grid.Column="0"/>
+                                <Grid  HorizontalAlignment="Left" VerticalAlignment="Top" Width="50" Height="35" Margin="8,8,0,0">
+                                    <Border CornerRadius="13" BorderThickness="0" Background="#5B5B5B"  Width="50" Height="35" Opacity="0.7"/>
+                                    <TextBlock Text="{Binding MarkAnime}" FontSize="24" FontWeight="Bold" Foreground="#BCBCBC" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                            </Grid>
+                            <!-- Название + год + кол-во серий -->
+                            <StackPanel Grid.Column="1" Margin="30,0,0,0">
+                                <TextBlock Text="{Binding NameAnime}" Tag="{Binding id}" FontSize="28" FontWeight="Bold" Foreground="White" Margin="0,0,0,10"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <Grid  HorizontalAlignment="Left" VerticalAlignment="Top" Width="86" Height="30">
+                                        <Border CornerRadius="13" BorderThickness="0" Background="#5B5B5B"  Width="86" Opacity="0.7"/>
+                                        <TextBlock Text="{Binding YearAnime}" FontSize="18" Foreground="#AAAAAA" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Grid>
+                                    <Grid  HorizontalAlignment="Left" VerticalAlignment="Top" Width="86" Height="30" Margin="20,0,0,0">
+                                        <Border CornerRadius="13" BorderThickness="0" Background="#5B5B5B"  Width="86" Opacity="0.7"/>
+                                        <TextBlock Text="{Binding EpisodesAnime}" FontSize="18" Foreground="#AAAAAA" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Grid>
+                                </StackPanel>
+                                <!-- Описание -->
+                                <TextBlock Text="{Binding DescriptionAnime}" TextTrimming="CharacterEllipsis" FontSize="18" Foreground="#CCCCCC" TextWrapping="Wrap" Height="90" Margin="0,10,0,0"/>
+                                <Grid VerticalAlignment="Bottom" HorizontalAlignment="Right">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <!-- Кнопка изменить -->
+                                    <Button Grid.Column="0" Content="Изменить" Click="EditMovie_Click" 
+                                    Style="{StaticResource NavButtonStyle}" Background="#FFD166" Margin="0,13,0,0"
+                                    Tag="{Binding NameAnime}">
+                                        <Button.Resources>
+                                            <Style TargetType="{x:Type Border}">
+                                                <Setter Property="CornerRadius" Value="7"/>
+                                            </Style>
+                                        </Button.Resources>
+                                    </Button>
+                                    <!-- Кнопка удалить -->
+                                    <Button Grid.Column="1" Content="Удалить" Click="DeleteMovie_Click" 
+                                    Style="{StaticResource NavButtonStyle}" Background="#EF476F" Margin="30,13,0,0"
+                                    Tag="{Binding id}">
+                                        <Button.Resources>
+                                            <Style TargetType="{x:Type Border}">
+                                                <Setter Property="CornerRadius" Value="7"/>
+                                            </Style>
+                                        </Button.Resources>
+                                    </Button>
+                                </Grid>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <!-- Grid для добавления нового фильма -->
+        <Grid x:Name="EditOverlay" Background="#80000000" Visibility="Collapsed">
+            <Border Width="756" Height="540" Background="#0D1B2A" CornerRadius="15" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="335"/>
+                        <ColumnDefinition Width="421"/>
+                    </Grid.ColumnDefinitions>
+                    <!-- Поле для выбора изображения -->
+                    <Button Grid.Column="0" Click="ChooseImage_Click" Background="Transparent" BorderThickness="0" Margin="15,0,0,0" Width="320" Height="480">
+                        <Grid Width="320" Height="480" Background="#415A77">
+                            <TextBlock x:Name="ReplaceImageTextBox" Text="+" FontSize="170" Margin="0,0,0,20" Foreground="#3C3C3C" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <Image x:Name="ReplaceImage" Source=" " Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Button>
+                    <Grid Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="89"/>
+                            <RowDefinition Height="61"/>
+                            <RowDefinition Height="328"/>
+                            <RowDefinition Height="62"/>
+                        </Grid.RowDefinitions>
+                        <!-- Название -->
+                        <TextBox x:Name="TitleInput" Grid.Row="0" Style="{StaticResource PlaceholderTextBoxStyle}" Tag="Введите название" FontSize="30" Foreground="#BCBCBC" Background="#0D1B2A"
+                                 Margin="23,0,0,0" Width="385" Height="36" HorizontalAlignment="Left"/>
+                        <!-- Год + Серии + Оценка -->
+                        <TextBox x:Name="YearInput" Grid.Row="1" Style="{StaticResource PlaceholderTextBoxStyle}" Tag="Год" Padding="4,2,0,0" FontSize="16" Foreground="#BCBCBC" 
+                                 Margin="23,0,0,0"  Width="109" Height="32" HorizontalAlignment="Left">
+                            <TextBox.Resources>
+                                <Style TargetType="{x:Type Border}">
+                                    <Setter Property="CornerRadius" Value="5"/>
+                                </Style>
+                            </TextBox.Resources>
+                        </TextBox>
+                        <TextBox x:Name="EpisodesInput"  Grid.Row="1" Style="{StaticResource PlaceholderTextBoxStyle}" Tag="Серии" Padding="4,2,0,0" FontSize="16" Foreground="#BCBCBC"
+                                 Margin="5,0,0,0"  Width="109" Height="32" HorizontalAlignment="Center">
+                            <TextBox.Resources>
+                                <Style TargetType="{x:Type Border}">
+                                    <Setter Property="CornerRadius" Value="5"/>
+                                </Style>
+                            </TextBox.Resources>
+                        </TextBox>
+                        <TextBox x:Name="RatingInput" Grid.Row="1" Style="{StaticResource PlaceholderTextBoxStyle}" Tag="Оценка" Padding="4,2,0,0" FontSize="16" Foreground="#BCBCBC"
+                                 Margin="0,0,15,0"  Width="109" Height="32" HorizontalAlignment="Right">
+                            <TextBox.Resources>
+                                <Style TargetType="{x:Type Border}">
+                                    <Setter Property="CornerRadius" Value="5"/>
+                                </Style>
+                            </TextBox.Resources>
+                        </TextBox>
+                        <!-- Описание -->
+                        <TextBox x:Name="DescriptionInput" Grid.Row="2" Style="{StaticResource PlaceholderTextBoxStyle}" Tag="Введите описание" Padding="2,2,0,0" FontSize="16" Foreground="#BCBCBC"
+                                  Width="383" Height="294.4" Margin="23,0,0,0" TextWrapping="Wrap" AcceptsReturn="True" HorizontalAlignment="Left">
+                            <TextBox.Resources>
+                                <Style TargetType="{x:Type Border}">
+                                    <Setter Property="CornerRadius" Value="5"/>
+                                </Style>
+                            </TextBox.Resources>
+                        </TextBox>
+                        <!-- Кнопки -->
+                        <Button x:Name="EditButton" Content="Изменить" Grid.Row="3" Click="Edit_Click" Background="#FFD166" FontSize="16" Foreground="#FFFFFF"
+                                Width="109" Height="32"  Margin="23,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Top">
+                            <Button.Resources>
+                                <Style TargetType="{x:Type Border}">
+                                    <Setter Property="CornerRadius" Value="10"/>
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+                        <Button x:Name="AddButton" Content="Добавить" Grid.Row="3" Click="AddMovie_Click" Background="#06D6A0" FontSize="16" Foreground="#FFFFFF"
+                                Width="109" Height="32"  Margin="28,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Top">
+                            <Button.Resources>
+                                <Style TargetType="{x:Type Border}">
+                                    <Setter Property="CornerRadius" Value="10"/>
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+                        <Button x:Name="CloseButton" Content="Отмена" Grid.Row="3" Click="CloseOverlay_Click" Background="#EF476F" FontSize="16" Foreground="#FFFFFF"
+                                Width="109" Height="32"  Margin="28,0,15,0" HorizontalAlignment="Right" VerticalAlignment="Top">
+                            <Button.Resources>
+                                <Style TargetType="{x:Type Border}">
+                                    <Setter Property="CornerRadius" Value="10"/>
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>
